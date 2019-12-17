@@ -1,7 +1,7 @@
 # ret2win Rop Emporium 
-# En parcourant le net j'ai remarqué qu'aucun write-up n'existe en français pour ROP Emporium
 
-## J'ai donc tout simplement décidé de faire le write-up de tout les chall's ROP emporium
+## En parcourant le net j'ai remarqué qu'aucun write-up n'existe en français pour ROP Emporium. J'ai donc tout simplement décidé de faire le write-up de tout les chall's ROP emporium
+
 
 Donc voici le chall : [ret2win](https://ropemporium.com/challenge/ret2win.html)
 On va faire le 64 bits
