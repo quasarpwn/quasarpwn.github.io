@@ -1,6 +1,9 @@
 # Write Up SantHackLaus ! 
 
+
+
 Yo tout le monde ! Le CTF SantHackLaus est fini et voici mon write up pour celui ci !
+Petit rapel de l'existence de mon [serveur discord](https://discord.gg/2bwhtP7)
 Juste je n'ai pas finis le chall car j'avais la flemme ou plutôt que je n'ai pas la patience nécessaire: à l'étape de l'éscalade de privilège j'ai ragé et tout arrêté. Je n'ai donc fais que le Part 1.
 
 Alors voici la traduction (merci Google) de l'énoncé du challenge:
