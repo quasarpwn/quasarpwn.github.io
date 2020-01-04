@@ -105,4 +105,4 @@ Nous avons pas de credentials continuons l'énumération sur le gogs:
 ![Image](crafthtb4.png)
 Je me suis un peu documenté sur gogs et chercher s'il n'y a pas de vulnerabilité mais apparament non, j'ai donc continuer l'énumération en allant sur Explorer pus en cliquand sur CRaft/Craft API ont tombe sur ça:
 
-![image](crafthtb5)
+![image](crafthtb5.png)
