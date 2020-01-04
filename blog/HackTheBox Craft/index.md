@@ -173,3 +173,4 @@ et
 +response = requests.post('https://api.craft.htb/api/brew/', headers=headers, data=json_data, verify=False)
 +print(response.text)
 ```
+Comme vous le remarquez des creds, comme ça au claire dans le code : ```auth=('dinesh', '4aUh0A8PbVJxgd'),```. Puis je me permettre la remarque un peu immature: on dirait le code de Vevo avant que Prosox et Kuroi'sh deface plusieurs Youtuber.
