@@ -106,3 +106,6 @@ Nous avons pas de credentials continuons l'énumération sur le gogs:
 Je me suis un peu documenté sur gogs et chercher s'il n'y a pas de vulnerabilité mais apparament non, j'ai donc continuer l'énumération en allant sur Explorer pus en cliquand sur CRaft/Craft API ont tombe sur ça:
 
 ![image](crafthtb5.png)
+
+Après un peu de recherche j'ai regarder dans commits:
+![image](crafthtb6.png)
