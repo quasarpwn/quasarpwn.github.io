@@ -51,3 +51,4 @@ Tres bien ! scannons les ports avec nmap maintenant:
 ```
 
 Comme vous remarquez le port 443 est ouvert avec du https, regardons cela.
+![Image](crafthtb.png)
