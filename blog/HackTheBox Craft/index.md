@@ -48,7 +48,52 @@ PS C:\Windows\system32\drivers\etc>
 
 Tres bien ! scannons les ports avec nmap maintenant:
 ```
+C:\Users\quasa>nmap -A craft.htb
+WARNING: Could not import all necessary Npcap functions. You may need to upgrade to the latest version from https://npcap.org. Resorting to connect() mode -- Nmap may not function completely
+Starting Nmap 7.80 ( https://nmap.org ) at 2020-01-04 07:53 Changement de date
+Nmap scan report for craft.htb (10.10.10.110)
+Host is up (0.11s latency).
+Not shown: 998 filtered ports
+PORT    STATE SERVICE  VERSION
+22/tcp  open  ssh      OpenSSH 7.4p1 Debian 10+deb9u5 (protocol 2.0)
+| ssh-hostkey:
+|   2048 bd:e7:6c:22:81:7a:db:3e:c0:f0:73:1d:f3:af:77:65 (RSA)
+|   256 82:b5:f9:d1:95:3b:6d:80:0f:35:91:86:2d:b3:d7:66 (ECDSA)
+|_  256 28:3b:26:18:ec:df:b3:36:85:9c:27:54:8d:8c:e1:33 (ED25519)
+443/tcp open  ssl/http nginx 1.15.8
+|_http-server-header: nginx/1.15.8
+|_http-title: About
+| ssl-cert: Subject: commonName=craft.htb/organizationName=Craft/stateOrProvinceName=NY/countryName=US
+| Not valid before: 2019-02-06T02:25:47
+|_Not valid after:  2020-06-20T02:25:47
+|_ssl-date: TLS randomness does not represent time
+| tls-alpn:
+|_  http/1.1
+| tls-nextprotoneg:
+|_  http/1.1
+Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel
+
+Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+Nmap done: 1 IP address (1 host up) scanned in 103.13 seconds
+
+C:\Users\quasa>
 ```
 
 Comme vous remarquez le port 443 est ouvert avec du https, regardons cela.
 ![Image](crafthtb.png)
+
+En regardans le code source de la page (ou juste en haut à droite) on trouve:
+```html
+<ul class="nav navbar-nav pull-right">
+            <li><a href="https://api.craft.htb/api/">API</a></li>
+            <li><a href="https://gogs.craft.htb/"><img border="0" alt="Git" src="/static/img/Git-Icon-Black.png" width="20" height="20"></a></li>
+          </ul>
+
+```
+
+Rajoutons donc les sous domaine api et gogs à c:/windows/system32/drivers/etc/hosts:
+```
+10.10.10.110 craft.htb api.craft.htb gogs.craft.htb
+```
+Regardons maintenant l'api: 
+![Image](crafthtb2.png)
