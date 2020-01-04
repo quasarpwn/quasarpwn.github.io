@@ -1,6 +1,6 @@
 # Blog 
 
-## [HackTheBox Craft Machine (retired) ](https://quasarpwn.github.io/blog/HackTheBox Craft/)
+## [HackTheBox Craft Machine (retired) ](https://quasarpwn.github.io/blog/HackTheBox%20Craft/)
 ```Petit wite up de la box Craft, une box assez amusante et très interessante et que j'ai bien aimé ! ```
 
 ## [Write Up MyStore Part1 SantHackLaus ](https://quasarpwn.github.io/blog/SantHackLaus-MyStore/)
