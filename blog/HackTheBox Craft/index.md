@@ -97,3 +97,12 @@ Rajoutons donc les sous domaine api et gogs à c:/windows/system32/drivers/etc/h
 ```
 Regardons maintenant l'api: 
 ![Image](crafthtb2.png)
+
+En regardant ce qu'on peux faire, le seul truc que je trouve interessant est:
+![Image](crafthtb3.png)
+
+Nous avons pas de credentials continuons l'énumération sur le gogs:
+![Image](crafthtb4.png)
+Je me suis un peu documenté sur gogs et chercher s'il n'y a pas de vulnerabilité mais apparament non, j'ai donc continuer l'énumération en allant sur Explorer pus en cliquand sur CRaft/Craft API ont tombe sur ça:
+
+![image](crafthtb5)
