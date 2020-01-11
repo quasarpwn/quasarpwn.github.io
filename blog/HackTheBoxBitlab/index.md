@@ -36,10 +36,10 @@ quasar@pwn:~$
 ```
 
 On continue donc sur le port 80, et l'existence d'un robots.txt nous interesse.
-![image](image1.jpg)
+![image](image1.png)
 
 Apr_s un peu d'énumération, /help m'interesse, je vais ensuite sur bookmarks.html comme ceci:
-![image](image2.jpg)
+![image](image2.png)
 Comme vous le remarquez, lorsqu'ont clique sur Gitlab login il n'y a rien, affichons donc le code source:
 ```html
 <!DOCTYPE NETSCAPE-Bookmark-file-1>
@@ -66,6 +66,6 @@ javascript:(function(){ var _0x4b18=[&quot;\x76\x61\x6C\x75\x65&quot;,&quot;\x75
 ```
 
 Lançons une console et essayons de comprendre:
-![image](image3.jpg)
+![image](image3.png)
 
 Mmmmh, fort interessant ! 
