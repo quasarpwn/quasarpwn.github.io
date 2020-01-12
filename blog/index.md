@@ -1,6 +1,7 @@
 # Blog 
 
 ## [HackTheBox Bitlab Machine (retired) ](https://quasarpwn.github.io/blog/HackTheBoxBitlab/)
+```Box très amusante mais plutôt simple, on découvre des crédential dans du javascript "obfusqué" on se connecte sur le gitlab puis on upload un shell on recupère d'autre crédentials dans la base de donné postgresql puis on se connecte on récupère le user on reverse un petit programme pour récuperer les cred's root et voila !```
 
 ## [HackTheBox Craft Machine (retired) ](https://quasarpwn.github.io/blog/HackTheBox%20Craft/)
 ```Petit wite up de la box Craft, une box assez amusante et très interessante et que j'ai bien aimé ! ```
