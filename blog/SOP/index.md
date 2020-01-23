@@ -252,7 +252,6 @@ p.interactive()
 Ahaha ! Aller à la prochaine !
 
 ```
-quasar@pwn:~/Bureau/pwn$ sh
 $ ls
 core  exploit.py  pad  sop  sop.c  Untitled-1
 $ id
